@@ -1,0 +1,7 @@
+.vscode/
+.venv
+cache/
+__pycache__/
+node_modules/
+
+ALL_SITES.nc
