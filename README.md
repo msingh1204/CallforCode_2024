@@ -1,1 +1,5 @@
-# CallforCode_2024
+# CallforCode_2024: _TeamSoMAS
+
+The 'eFlood' solution presented by '_TeamSoMAS' of Stony Brook University provides users in NYC with travel routes which avoid flooded regions. On the back-end, the solution integrates 311 complaints (https://opendata.cityofnewyork.us/) and NYC Micronet (https://www.nysmesonet.org/networks/nyc) sensor data to identify, validate, and characterize flooded areas in NYC. The resulting list of coordinates is passed to the open-source OSMnx (https://osmnx.readthedocs.io/en/stable/getting-started.html) software to compute the shortest path between an origin and destination address provided by the user. In the near future, we aim to incorporate the Floodnet sensor network (https://www.floodnet.nyc/) via API. 
+
+On the front-end, the solution integrates a React ChatBox (https://create-react-app.dev/). The IBM Watsonx Large Language Models (LLMs) provide non-English and English speakers alike with a user-friendly experience. The Granite Multilingual and Granite Instruct models allow users to input a prompt containing their origin and destination addresses in either English or non-English text. The LLM is able to extract the addresses for geocoding. The returned coordinates, along with a list of exclusions is then provided to OSMnx for route mapping. This route is then displayed to the user on the front-end. 
