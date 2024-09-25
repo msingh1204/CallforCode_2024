@@ -18,7 +18,8 @@ from utils import (
     return_exclusions,
     get_geocode_address,
     translate_to_english,
-    convert_to_address
+    convert_to_address,
+    is_english
 )
 
 app = Flask(__name__)
@@ -76,21 +77,27 @@ def geocode_address() -> str:
         str: lat, lon as a comma separated string: ex: "40.7484,-73.9857, 2024/09/15 13:26:07"
     """
     address_phrase = request.args.get("address", type=str)
-    
-    print('received address_phrase')
-    print(address_phrase)
-    address_english = translate_to_english(address_phrase)
-    
-    print('received address_english')
-    print(address_english)
+
+    def try_translate(address):
+        # If it is in English, just return it. 
+        try:
+            if is_english(address):
+                return "english", address
+
+            return translate_to_english(address)
+        except Exception:
+            return "english", address
+
+    address_english = try_translate(address_phrase)
     english_to_address = convert_to_address(address_english[1])
-    print('received english_to_address')
-    print(english_to_address)
+
+    # Output from english_to_address should be input for get_geocode_address() in line 83
 
     try:
-        coords = get_geocode_address(english_to_address[1])
+        coords_origin = get_geocode_address(english_to_address[0])
+        coords_dest = get_geocode_address(english_to_address[1])
         ct_string = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        return f"{coords[0]},{coords[1]},{ct_string}"
+        return ({"Origin" : coords_origin, "Destination" : coords_dest, "Time_Str" : ct_string})
     except GeocoderServiceError as e:
         # Return the error message to the front end in the response
         return make_response(str(e), 422)

@@ -116,3 +116,46 @@ Prompt: "{text_in}"
 
 Output:
 """
+
+IS_ENGLISH = """Task Description:
+
+You are a language detection assistant. For any given input text, your task is to detect if the language is English.
+
+You MUST return a valid JSON response in the following format with NO additional text
+
+Your JSON string should have a SINGLE property ENGLISH that has a boolean value:
+
+{{"english": "[Output]"}}
+
+Here is an example:
+
+Example 1:
+
+Input: "Bonjour, je m'appelle Marie."
+
+Output: {{"english": false}}
+
+Example 2:
+
+Input: "Hi, how are you doing today?"
+
+Output: {{"english": true}}
+
+Example 3:
+
+Input: "Dónde está la biblioteca?"
+
+Output: {{"english": false}}
+
+Example 4:
+
+Input: "Guten Tag, wie geht es Ihnen?"
+
+Output: {{"english": "false"}}
+
+Now take this input and return a VALID JSON string that has should have a SINGLE property english that has a boolean value:
+
+Input: "{text_in}"
+Output:
+
+"""

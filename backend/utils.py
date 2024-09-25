@@ -1,3 +1,4 @@
+import re
 import json
 from typing import List, Tuple
 import osmnx as ox
@@ -17,6 +18,7 @@ from geopy.distance import geodesic
 
 from prompts import TRANSLATE_TO_ENGLISH
 from prompts import prompt_to_address
+from prompts import IS_ENGLISH
 
 def query_IDA_calls():
     
@@ -215,6 +217,32 @@ def convert_to_address(prompt: str):
     data = json.loads(generated_response[:-2])
 
     return data['Origin Address'], data['Destination Address']
+
+def is_english(prompt: str) -> bool:    
+    def get_credentials():
+        return {"url": "https://us-south.ml.cloud.ibm.com",
+                "apikey": 'GcIVluc4n_68GXXy3AgZAeyKXyjGoIqOOLyvrJmxwRAu'}
+
+    model_id = "ibm/granite-20b-multilingual"
+
+    parameters = {"decoding_method": "greedy", "max_new_tokens": 10, "repetition_penalty": 1.0, 'temperature': 0.0}
+    project_id = '52007346-29cf-40eb-9b7b-96a604bc7285'
+
+    model = Model(
+        model_id=model_id,
+        params=parameters,
+        credentials=get_credentials(),
+        project_id=project_id)
+
+    prompt = IS_ENGLISH.format(text_in = prompt)
+    generated_response = model.generate_text(prompt=prompt)
+    
+    json_string = re.search(r'\{.*\}', generated_response).group(0)
+    try:
+        json_dict = json.loads(json_string)
+        return json_dict['english']
+    except Exception:
+        return True
 
 
 if __name__ == "__main__":
