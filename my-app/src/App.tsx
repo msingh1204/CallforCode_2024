@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
+import {
+	MapContainer,
+	TileLayer,
+	GeoJSON,
+	useMap,
+	Polygon,
+} from 'react-leaflet';
 import L from 'leaflet';
 import { Paper } from '@mui/material';
 import { TextInput } from './TextInput';
@@ -44,7 +50,7 @@ function App() {
 	const [userDestination, setUserDestination] = useState<string>('');
 	const [userDefinedExclusions, setUserDefinedExclusions] = useState<string>('');
 	const [evacuationPath, setEvacuationPath] = useState();
-	const display311Data = false;
+	const display311Data = true;
 	const debugPathPlanning = false;
 
 	async function get_geocode_address(
@@ -62,16 +68,19 @@ function App() {
 			switch (currentStep.key) {
 				case 'start':
 					setChatHistory([
-						...chatHistory,
+						...chatHistory.slice(0, -1),
 						{
-							message: 'Got it! Setting your start point',
+							message: 'Thank you, message received.',
 							timestamp: new Date().toLocaleString(),
 							displayName: 'System',
 						} as ChatMessage,
 					]);
-					[lat, lon] = response.data.split(',');
+					let newOrigin = response.data.Origin;
+					let newDest = response.data.Destination;
+					setUserStartLocation(newOrigin[0] + ',' + newOrigin[1]);
+					setUserDestination(newDest[0] + ',' + newDest[1]);
+					setUserQuestion('');
 					locationString = lat + ',' + lon;
-					setUserStartLocation(locationString);
 					break;
 				case 'ask_evacuation_destination':
 					setChatHistory([
@@ -123,13 +132,13 @@ function App() {
 	const chatFlow: ChatFlow = {
 		start: {
 			key: 'start',
-			message: 'Please enter your current location',
+			message: 'How can I help?',
 			function: (
 				userAddress: string,
 				currentStep: ChatFlowNode,
 				chatHistory: ChatMessage[]
 			) => get_geocode_address(userAddress, currentStep, chatHistory),
-			path: 'ask_evacuation_destination',
+			path: 'end',
 		},
 		ask_evacuation_destination: {
 			key: 'ask_evacuation_destination',
@@ -274,10 +283,10 @@ function App() {
 		}
 	}
 	useEffect(() => {
-		if (userDefinedExclusions != '') {
-			getEvacuationPath(userStartLocation, userDestination, userDefinedExclusions);
+		if (userDestination != '') {
+			getEvacuationPath(userStartLocation, userDestination, '');
 		}
-	}, [userDefinedExclusions]);
+	}, [userDestination]);
 
 	return (
 		<ThemeProvider theme={theme}>
@@ -334,11 +343,12 @@ function App() {
 						attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 					/>
 					{display311Data && geoJSONData311 && (
-						<GeoJSON
-							data={geoJSONData311}
-							pointToLayer={pointToLayer}
-							onEachFeature={onEachFeature}
-						/>
+						// <GeoJSON
+						// 	data={geoJSONData311}
+						// 	pointToLayer={pointToLayer}
+						// 	onEachFeature={onEachFeature}
+						// />
+						<Polygon positions={geoJSONData311} color='blue' />
 					)}
 					{evacuationPath && <GeoJSON data={evacuationPath} />}
 					<SetViewOnLoad center={[40.7486538125, -73.98530431249999]} zoom={14} />

@@ -112,7 +112,7 @@ def get_shortest_safe_route(
     Returns:
         gpd.GeoDataFrame: A Geo Dataframe with the edges of the shortest safe route.
     """
-    G = ox.graph_from_place("Manhattan, New York, USA", network_type="drive")
+    G = ox.graph_from_place("New York City, New York, USA", network_type="drive")
 
     orig_idx = ox.nearest_nodes(G, orig[1], orig[0])
     dest_idx = ox.nearest_nodes(G, dest[1], dest[0])

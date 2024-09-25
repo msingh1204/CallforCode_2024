@@ -30,7 +30,7 @@ script_path = os.path.abspath(__file__)
 
 @app.route("/geojson", methods=["GET"])
 def get_all_points():
-    geoData = gpd.read_file("311_services.geojson")
+    geoData = gpd.read_file("exclusions_list.geojson")
     return jsonify(geoData.to_json())
 
 
